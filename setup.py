@@ -1,6 +1,5 @@
-from os import path, getcwd, system, environ
+from os import path, getcwd
 from sys import argv
-import subprocess
 
 nvm_start_comment = "# nvm start"
 nvm_end_comment = "# nvm end"
