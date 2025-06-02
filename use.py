@@ -41,6 +41,45 @@ def use_node_version():
         print("Make sure to source/reload your terminal with 'source ~/.bashrc'")
     else:
         print(f"Version {version_number} not found.")
-        if len(argv) <= 2:  # Was read from .nvmrc
-            print(f"Install it first with: nvm install {version_number}")
-        exit()
+        
+        # Ask user if they want to install the missing version
+        try:
+            response = input(f"Would you like to install Node.js {version_number}? (y/N): ").strip().lower()
+            if response in ['y', 'yes']:
+                print(f"Installing Node.js {version_number}...")
+                # Import install function and call it
+                from install import install_node_version
+                # Temporarily modify argv to simulate 'nvm install <version>'
+                original_argv = argv.copy()
+                argv.clear()
+                argv.extend(['nvm.py', 'install', version_number])
+                try:
+                    install_node_version()
+                    # After successful installation, use the version
+                    f = open(path.expanduser("~/node/current_used_version"), "w")
+                    f.write(version_number)
+                    print(f"Now using version number {version_number}")
+                    print("Make sure to source/reload your terminal with 'source ~/.bashrc'")
+                except SystemExit:
+                    # install_node_version() calls exit(), so we catch it and continue
+                    # Check if installation was successful
+                    if get_node_versions().count(version_number) != 0:
+                        f = open(path.expanduser("~/node/current_used_version"), "w")
+                        f.write(version_number)
+                        print(f"Now using version number {version_number}")
+                        print("Make sure to source/reload your terminal with 'source ~/.bashrc'")
+                    else:
+                        print("Installation failed.")
+                        exit()
+                finally:
+                    # Restore original argv
+                    argv.clear()
+                    argv.extend(original_argv)
+            else:
+                print("Installation cancelled.")
+                if len(argv) <= 2:  # Was read from .nvmrc
+                    print(f"You can install it later with: nvm install {version_number}")
+                exit()
+        except KeyboardInterrupt:
+            print("\nInstallation cancelled.")
+            exit()
