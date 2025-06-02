@@ -2,6 +2,14 @@
 
 A Node.js version manager designed specifically for Steam Deck's read-only file system.
 
+## Key Features
+
+- **🚀 Auto-switching**: Automatically switches Node.js versions based on `.nvmrc` files when opening terminals or changing directories
+- **📦 Auto-install**: Prompts to automatically install missing versions when you try to use them
+- **🏷️ LTS identification**: Clearly marks LTS versions with their codenames (Iron, Hydrogen, Gallium, etc.)
+- **🔧 Easy setup/removal**: One-command installation and removal with automatic environment reloading
+- **💾 Steam Deck optimized**: Works perfectly with Steam Deck's read-only file system
+
 ## Why not use the original NVM?
 
 The Steam Deck uses a read-only file system, which makes installing the original NVM complicated and potentially risky. This lightweight Python-based alternative provides the same essential functionality without needing to modify system files.
@@ -19,6 +27,24 @@ if [ -f ~/node/current_used_version ]; then
 fi
 
 alias nvm="python {getcwd()}/nvm.py"
+
+# Auto-switch Node.js version based on .nvmrc when changing directories
+nvm_auto_use() {
+    if [ -f .nvmrc ]; then
+        python {getcwd()}/nvm.py auto
+    fi
+}
+
+# Hook into cd command to auto-detect .nvmrc
+cd() {
+    builtin cd "$@"
+    nvm_auto_use
+}
+
+# Auto-detect .nvmrc when terminal starts (only for interactive shells)
+if [[ $- == *i* ]]; then
+    nvm_auto_use
+fi
 ```
 
 Here's what happens:
@@ -68,7 +94,10 @@ nvm -a
 nvm available
 ```
 
-Shows all Node.js versions you can install. Versions already on your system will be marked as "(installed)".
+Shows all Node.js versions you can install. Features:
+
+- **LTS versions** are clearly marked with their codename (e.g., "LTS: Iron", "LTS: Hydrogen")
+- **Installed versions** are marked with a left arrow `← (installed)` if you have the latest version of that major series installed
 
 ### Install a Node.js version
 
@@ -99,7 +128,26 @@ nvm use lts            # Switch to latest LTS installed version
 nvm use                # Auto-detect and use version from .nvmrc file
 ```
 
+**Auto-install feature**: If you try to use a version that isn't installed, NVM will ask if you'd like to install it automatically:
+
+```bash
+nvm use 18.20.4
+# Version 18.20.4 not found.
+# Would you like to install Node.js 18.20.4? (y/N): y
+# Installing Node.js 18.20.4...
+# Now using version number 18.20.4
+```
+
+This works with both explicit versions and `.nvmrc` files, making it easy to get up and running in any project without manual installation steps.
+
 **`.nvmrc` support**: Create a `.nvmrc` file in your project directory containing just the version number (like `20.18.3` or `v20.18.3`). When you run `nvm use` without arguments, it will automatically use the version specified in the `.nvmrc` file.
+
+**Automatic version switching**: NVM automatically detects and switches Node.js versions in two scenarios:
+
+- **On terminal startup**: When you open a new terminal, if there's a `.nvmrc` file in the current directory, NVM automatically switches to that version
+- **When changing directories**: When you `cd` into a directory with a `.nvmrc` file, NVM automatically switches to that version
+
+If the required version isn't installed, NVM will offer to install it automatically with your confirmation.
 
 ### Remove a version
 
@@ -127,7 +175,17 @@ Shows help for all available commands.
 nvm auto               # Manually check and switch to .nvmrc version
 ```
 
-**Automatic detection**: When you navigate to a directory containing a `.nvmrc` file, NVM will automatically detect and switch to that version (if installed). If the version isn't installed, it will show you how to install it.
+**Automatic detection**: NVM provides seamless automatic version switching:
+
+- **Terminal startup**: When you open a new terminal, if there's a `.nvmrc` file in the current directory, NVM automatically switches to that version
+- **Directory navigation**: When you `cd` into a directory with a `.nvmrc` file, NVM automatically switches to that version  
+- **Auto-install**: If the required version isn't installed, NVM will offer to install it automatically with your confirmation
+
+**Manual detection**: You can also manually trigger version detection:
+
+```bash
+nvm auto               # Manually check and switch to .nvmrc version
+```
 
 ## .nvmrc File Format
 
@@ -146,9 +204,11 @@ v20.18.3
 **Example workflow**:
 
 1. Create `.nvmrc` in your project: `echo "20.18.3" > .nvmrc`
-2. Install the version: `nvm install 20.18.3`
-3. Navigate to your project directory - NVM automatically switches to that version!
-4. Or run `nvm use` without arguments to manually switch to the .nvmrc version
+2. Navigate to your project directory - NVM automatically detects the version and offers to install it if needed
+3. Accept installation when prompted, and you're ready to go!
+4. Future visits to the directory will automatically switch to the correct version
+
+**Seamless development**: Once set up, you never need to manually switch Node.js versions again. Just navigate to your projects and NVM handles everything automatically.
 
 ## Uninstalling
 
