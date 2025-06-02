@@ -8,8 +8,13 @@ def get_node_versions():
         return split_name[0]
     
     folders = []
+    node_dir = path.expanduser('~/node')
+    
+    # Check if the node directory exists
+    if not path.exists(node_dir):
+        return []
 
-    for folder in listdir(path.expanduser('~/node')):
+    for folder in listdir(node_dir):
         if path.isdir(path.expanduser(f"~/node/{folder}")) and folder.startswith("node-v"):
             folders.append(folder)
 
