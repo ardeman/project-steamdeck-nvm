@@ -25,6 +25,11 @@ cd() {{
     builtin cd "$@"
     nvm_auto_use
 }}
+
+# Auto-detect .nvmrc when terminal starts (only for interactive shells)
+if [[ $- == *i* ]]; then
+    nvm_auto_use
+fi
 {nvm_end_comment}"""
 
 # remove old setup
