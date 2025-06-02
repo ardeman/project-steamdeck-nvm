@@ -12,6 +12,19 @@ if [ -f ~/node/current_used_version ]; then
 fi
 
 alias nvm="python {getcwd()}/nvm.py"
+
+# Auto-switch Node.js version based on .nvmrc when changing directories
+nvm_auto_use() {{
+    if [ -f .nvmrc ]; then
+        python {getcwd()}/nvm.py auto
+    fi
+}}
+
+# Hook into cd command to auto-detect .nvmrc
+cd() {{
+    builtin cd "$@"
+    nvm_auto_use
+}}
 {nvm_end_comment}"""
 
 # remove old setup

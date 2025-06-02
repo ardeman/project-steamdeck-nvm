@@ -96,7 +96,10 @@ Shows all Node.js versions currently installed on your system.
 nvm use 20.18.3        # Switch to a specific version
 nvm use latest         # Switch to latest installed version
 nvm use lts            # Switch to latest LTS installed version
+nvm use                # Auto-detect and use version from .nvmrc file
 ```
+
+**`.nvmrc` support**: Create a `.nvmrc` file in your project directory containing just the version number (like `20.18.3` or `v20.18.3`). When you run `nvm use` without arguments, it will automatically use the version specified in the `.nvmrc` file.
 
 ### Remove a version
 
@@ -117,6 +120,34 @@ nvm help
 ```
 
 Shows help for all available commands.
+
+### Auto-detect .nvmrc
+
+```bash
+nvm auto               # Manually check and switch to .nvmrc version
+```
+
+**Automatic detection**: When you navigate to a directory containing a `.nvmrc` file, NVM will automatically detect and switch to that version (if installed). If the version isn't installed, it will show you how to install it.
+
+## .nvmrc File Format
+
+Create a `.nvmrc` file in your project root with just the Node.js version:
+
+```text
+20.18.3
+```
+
+or with the 'v' prefix:
+
+```text
+v20.18.3
+```
+
+**Example workflow**:
+1. Create `.nvmrc` in your project: `echo "20.18.3" > .nvmrc`
+2. Install the version: `nvm install 20.18.3`
+3. Navigate to your project directory - NVM automatically switches to that version!
+4. Or run `nvm use` without arguments to manually switch to the .nvmrc version
 
 ## Uninstalling
 
