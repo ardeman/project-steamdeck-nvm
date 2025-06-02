@@ -1,5 +1,6 @@
-from os import path, getcwd
+from os import path, getcwd, system, environ
 from sys import argv
+import subprocess
 
 nvm_start_comment = "# nvm start"
 nvm_end_comment = "# nvm end"
@@ -26,6 +27,8 @@ if (nvm_start_comment in file_str and nvm_end_comment in file_str):
   file.close()
 
 if (len(argv) > 1 and argv[1] == 'remove'):
+  print("NVM setup has been removed from your .bashrc file.")
+  print("Please restart your terminal or run 'source ~/.bashrc' to apply changes.")
   exit()
 
 # append new setup
@@ -38,4 +41,5 @@ file = open(path.expanduser("~/.bashrc"), "w")
 file.write(file_str)
 file.close()
 
-print("Setup complete, reopen your terminal or source it using 'source ~/.bashrc'")
+print("🎉 Setup completed successfully! Your NVM environment is now ready to use.")
+print("Please restart your terminal or run 'source ~/.bashrc' to apply changes.")
