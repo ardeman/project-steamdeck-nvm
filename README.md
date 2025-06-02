@@ -1,71 +1,147 @@
 # NVM for Steam Deck
 
-NVM substitute for Steam Deck with readonly system.
+A Node.js version manager designed specifically for Steam Deck's read-only file system.
 
-## Why even do this when NVM exists already?
+## Why not use the original NVM?
 
-Since I didn't want to mess with readonly system on SD and installing the original nvm, I decided to create my own one written in python. I have chosen python because it is already installed on SD and accessible via konsole.
+The Steam Deck uses a read-only file system, which makes installing the original NVM complicated and potentially risky. This lightweight Python-based alternative provides the same essential functionality without needing to modify system files.
 
-## How does it work?
+**Why Python?** Python comes pre-installed on Steam Deck and is accessible through Konsole, making this solution simple and safe to use.
 
-It puts this config into your .bashrc file:
+## How it works
+
+This tool works by adding a simple configuration to your `.bashrc` file:
 
 ```bash
-NODE_VERSION=$(<~/node/current_used_version)
-
-export PATH="$HOME/node/node-v${NODE_VERSION}-linux-x64/bin:$PATH"
+if [ -f ~/node/current_used_version ]; then
+    NODE_VERSION=$(<~/node/current_used_version)
+    export PATH="$HOME/node/node-v${NODE_VERSION}-linux-x64/bin:$PATH"
+fi
 
 alias nvm="python {getcwd()}/nvm.py"
 ```
 
-1. It creates a file which stores your current used version
-1. Whenever you then open a konsole, it reads current version and adds it to your path, so now your node and npm binaries can be used from command line
-1. It adds an alias to the nvm script, allowing you to use it from anywhere
+Here's what happens:
 
-**Note:** This config is surrounded by comments so that it can be later removed. For removal, see [this section](#removal)
+1. **Version tracking**: Creates a file that stores your currently active Node.js version
+2. **Automatic PATH setup**: When you open a terminal, it reads the current version and adds Node.js binaries to your PATH
+3. **Convenient alias**: Adds an `nvm` command that you can use from anywhere
+
+The configuration is wrapped in comments so it can be cleanly removed later if needed.
+
+## Easy setup and removal
+
+This NVM includes convenient scripts that handle everything automatically:
+
+- **`setup.sh`** - Installs NVM and makes it immediately available in your current terminal
+- **`remove.sh`** - Completely removes NVM from your system
+
+Both scripts automatically reload your environment, so you never need to manually restart your terminal or run source commands.
 
 ## Installation
 
-Download the release, extract it into a folder where you want this tool to be located, run `python setup.py` and close/open your terminal (or source it using `source ~/.bashrc` command).
+1. Download and extract this tool to any folder you like
+2. Open Konsole and navigate to the folder
+3. Run the setup script:
+
+```bash
+./setup.sh
+```
+
+That's it! The script will:
+
+- Configure your `.bashrc` file automatically
+- Start a fresh terminal session with NVM ready to use
+- No manual steps required!
+
+**Manual installation**: If you prefer, you can run `python setup.py` instead, but you'll need to restart your terminal or run `source ~/.bashrc` afterward.
 
 ## Usage
 
-This utility comes with the basic nvm functionality, such as installing and switching node versions.
+Once installed, you can use all the standard NVM commands to manage Node.js versions:
 
-### **list (-l)**
+### View available versions
 
-`nvm list` lists all versions that are available on your system. These are pulled out of `~/node` directory where this nvm downloads node version. If you decide to download versions manually, you can do so and by putting them in this folder, nvm will check them when installing/switching versions. You need to retain the official package name.
+```bash
+nvm -a
+# or
+nvm available
+```
 
-### **install (-i)**
+Shows all Node.js versions you can install. Versions already on your system will be marked as "(installed)".
 
-`nvm install <version>` installs the version you specify. This version is then installed into `~/node` directory.
+### Install a Node.js version
 
-You can also use `latest` which will download the latest release, or `lts` which will download latest long term support version.
+```bash
+nvm install 20.18.3    # Install a specific version
+nvm install latest     # Install the latest version
+nvm install lts        # Install the latest LTS version
+```
 
-### **use (-u)**
+Versions are downloaded to `~/node` directory.
 
-`nvm use <version>` updates the version that is currently used. Since version is read into your `.bashrc` file, you will need to either reopen your terminal, or source it using `soruce ~/.bashrc` command.
+### List installed versions
 
-### **remove (-r)**
+```bash
+nvm -l
+# or  
+nvm list
+```
 
-`nvm remove <version>` removes the version you specify.
+Shows all Node.js versions currently installed on your system.
 
-You can also use `latest` which will remove the latest release, or `lts` which will remove latest long term support version.
+### Switch to a version
 
-**Note:** Remove always pulls info about latest and lts versions from up-to-date nodejs.org index of versions. This means that installing latest/lts and later wanting to remove them by using `nvm remove latest/lts` might end up in version not being found on your system. In this case, remove the version by using its number.
+```bash
+nvm use 20.18.3        # Switch to a specific version
+nvm use latest         # Switch to latest installed version
+nvm use lts            # Switch to latest LTS installed version
+```
 
-### **available (-a)**
+### Remove a version
 
-`nvm available` lists all available versions that can be installed. It also shows which versions are already installed on your system by marking them like this: `vX.Y.Z (installed)`
+```bash
+nvm remove 20.18.3     # Remove a specific version
+nvm remove latest      # Remove the latest version
+nvm remove lts         # Remove the latest LTS version
+```
 
-### **help (-h)**
+**Note**: The `latest` and `lts` keywords always refer to the current latest/LTS versions from nodejs.org. If you installed a version when it was "latest" but it's no longer the latest, you may need to remove it by its specific version number.
 
-`nvm help` shows help for all of the commands available in this tool. Help is also shown when running only `nvm` command.
+### Get help
 
-## Removal
+```bash
+nvm -h
+# or
+nvm help
+```
 
-If you decide to remove this nvm, you can simply run `python setup.py remove` which will remove any changes made to your `.bashrc` file.
+Shows help for all available commands.
 
-## Issues
+## Uninstalling
 
-If you encounter any problems with this tool, feel free to raise an issue in this github repo.
+To completely remove NVM from your Steam Deck:
+
+```bash
+./remove.sh
+```
+
+This will:
+
+- Remove all NVM configuration from your `.bashrc` file
+- Start a fresh terminal session with NVM completely removed
+- Clean removal with no manual steps required!
+
+**Manual removal**: You can also run `python setup.py remove` if you prefer, but you'll need to restart your terminal or run `source ~/.bashrc` afterward.
+
+**Note**: This only removes the NVM tool itself. If you want to delete your installed Node.js versions too, manually delete the `~/node` directory.
+
+## Troubleshooting
+
+If you encounter any problems:
+
+1. **Make sure the scripts are executable**: Run `chmod +x setup.sh remove.sh`
+2. **Check you're in the right directory**: The scripts need to be run from the folder where you extracted NVM
+3. **Try manual installation**: If the scripts don't work, try `python setup.py` instead
+
+For other issues, please create an issue on this project's GitHub repository.
