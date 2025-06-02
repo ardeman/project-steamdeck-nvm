@@ -6,9 +6,10 @@ nvm_end_comment = "# nvm end"
 
 setup_to_append = f"""
 {nvm_start_comment}
-NODE_VERSION=$(<~/node/current_used_version)
-
-export PATH="$HOME/node/node-v${{NODE_VERSION}}-linux-x64/bin:$PATH"
+if [ -f ~/node/current_used_version ]; then
+    NODE_VERSION=$(<~/node/current_used_version)
+    export PATH="$HOME/node/node-v${{NODE_VERSION}}-linux-x64/bin:$PATH"
+fi
 
 alias nvm="python {getcwd()}/nvm.py"
 {nvm_end_comment}"""
