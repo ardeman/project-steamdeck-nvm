@@ -144,6 +144,7 @@ v20.18.3
 ```
 
 **Example workflow**:
+
 1. Create `.nvmrc` in your project: `echo "20.18.3" > .nvmrc`
 2. Install the version: `nvm install 20.18.3`
 3. Navigate to your project directory - NVM automatically switches to that version!
