@@ -7,5 +7,6 @@ def show_available_versions():
     data = json.load(url)
     data = data[::-1]
     for version in data:
-        installed = " (installed)" if get_node_versions().count(version['version'][1:]) != 0 else ""
-        print(version['version'][1:] + installed)
+        installed = " ← (installed)" if get_node_versions().count(version['version'][1:]) != 0 else ""
+        lts = f" (LTS: {version['lts']})" if version['lts'] != False else ""
+        print(version['version'][1:] + lts + installed)
